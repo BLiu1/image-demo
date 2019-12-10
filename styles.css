@@ -1,0 +1,8 @@
+html {
+    margin: 0;
+}
+
+img, canvas {
+    max-height: 100vh;
+    max-width: 50vw;
+}
