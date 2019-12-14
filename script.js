@@ -1,12 +1,12 @@
-let imageLoader = document.getElementById("file-input");
-let originalImage = document.getElementById("original-image");
-let filteredImageCanvas = document.getElementById("filtered-image");
-let filterChanger = document.getElementById("filter-changer");
-let parameterSlider = document.getElementById("slider");
+const imageLoader = document.getElementById("file-input");
+const originalImage = document.getElementById("original-image");
+const filteredImageCanvas = document.getElementById("filtered-image");
+const filterChanger = document.getElementById("filter-changer");
+const parameterSlider = document.getElementById("slider");
 
 let imageUploaded = false;
 
-let scaleSlider = function () {
+const scaleSlider = function () {
     let filter = filterChanger.value,
         value = parameterSlider.value,
         result;
@@ -19,8 +19,8 @@ let scaleSlider = function () {
             result = value / 256.0 * 2;
             break;
         case "lowpass":
-            let i = Math.floor(value / 32.0),
-                choices = [1, 3, 5, 9, 17, 33, 65, 129];
+            let i = Math.floor(value / 16.0),
+                choices = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31];
             result = choices[i];
             break;
         default:
@@ -32,7 +32,7 @@ let scaleSlider = function () {
 }
 
 // Draws the filtered image to the result canvas
-let drawFilteredImage = function (e) {
+const drawFilteredImage = function (e) {
     let filter = filterChanger.value;
 
     if (imageUploaded) {
@@ -46,7 +46,7 @@ let drawFilteredImage = function (e) {
 }
 
 // Handle image upload into img tag
-let loadImage = function (e) {
+const loadImage = function (e) {
     let reader = new FileReader();
 
     reader.onload = function (event) {

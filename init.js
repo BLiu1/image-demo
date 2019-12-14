@@ -1,5 +1,7 @@
+// all project-related image manipulation and display functions
 let Project = {};
 
+// takes an Image object and returns an ImageData array
 Project.getImage = function (img) {
     let c = document.createElement('canvas');
     c.width = img.width;
@@ -11,29 +13,31 @@ Project.getImage = function (img) {
     return ctx.getImageData(0, 0, img.width, img.height);
 };
 
-Project.printCanvas = function (selector, idata) {
-    selector.width = idata.width;
-    selector.height = idata.height;
+// prints ImageData (idata) to a canvas (outputCanvas)
+Project.printCanvas = function (outputCanvas, idata) {
+    outputCanvas.width = idata.width;
+    outputCanvas.height = idata.height;
 
-    let ctx = selector.getContext('2d');
-    ctx.putImageData(idata, 0, 0);
-
+    let ctx = outputCanvas.getContext('2d');
+    // if canvas is resized from CSS, resize image
+    ctx.putImageData(idata, 0, 0, 0, 0, outputCanvas.clientWidth, outputCanvas.clientHeight);
 };
 
-Project.filterImage = function (selector, filter, image, otherArgs) {
+// takes an Image object, filters it with the selected filter
+// and optional arguments (otherArgs) and outputs it to a canvas
+Project.filterImage = function (outputCanvas, filter, image, otherArgs) {
     let args = [this.getImage(image), otherArgs];
-
-    return this.printCanvas(selector, filter.apply(null, args));
+    return this.printCanvas(outputCanvas, filter.apply(null, args));
 };
 
-Project.redrawCanvas = function (selector, filter) {
-    let ctx = selector.getContext('2d');
-
-    ctx = [ctx.getImageData(0, 0, selector.width, selector.height)];
-
-    return this.printCanvas(selector, filter.apply(null, ctx));
+// applies a filter (with otherArgs) on an existing canvas 
+Project.redrawCanvas = function (canvas, filter, otherArgs) {
+    let ctx = canvas.getContext('2d');
+    let args = [ctx.getImageData(0, 0, canvas.width, canvas.height), otherArgs];
+    return this.printCanvas(canvas, filter.apply(null, args));
 };
 
+// convolves an ImageData pixels array with a square 1D kernel (weights)
 Project.convolve = function (pixels, weights) {
     let side = Math.round(Math.sqrt(weights.length)),
         halfSide = Math.floor(side / 2),
@@ -44,18 +48,17 @@ Project.convolve = function (pixels, weights) {
         temporaryCtx = temporaryCanvas.getContext('2d'),
         outputData = temporaryCtx.createImageData(canvasWidth, canvasHeight);
 
+    // for every image pixel
     for (let y = 0; y < canvasHeight; y++) {
-
         for (let x = 0; x < canvasWidth; x++) {
-
             let dstOff = (y * canvasWidth + x) * 4,
                 sumReds = 0,
                 sumGreens = 0,
                 sumBlues = 0;
 
+            // for every kernel position
             for (let kernelY = 0; kernelY < side; kernelY++) {
                 for (let kernelX = 0; kernelX < side; kernelX++) {
-
                     let currentKernelY = y + kernelY - halfSide,
                         currentKernelX = x + kernelX - halfSide;
 
@@ -77,12 +80,14 @@ Project.convolve = function (pixels, weights) {
             outputData.data[dstOff] = sumReds;
             outputData.data[dstOff + 1] = sumGreens;
             outputData.data[dstOff + 2] = sumBlues;
-            outputData.data[dstOff + 3] = 255;
+            outputData.data[dstOff + 3] = 255; // alpha channel
         }
     }
     return outputData;
 };
 
+// applies threshold filter
+// threshold parameter is threshold value
 Project.threshold = function (pixels, threshold) {
     threshold = threshold || 128; // default to 128
 
@@ -92,15 +97,20 @@ Project.threshold = function (pixels, threshold) {
             b = pixels.data[i + 2];
 
         // grayscale conversion
-        let value = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        // let value = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
         // set red, green, and blue channels to all or none depending on threshold
-        pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = (value > threshold) ? 255 : 0;
+        // pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = (value > threshold) ? 255 : 0;
+        pixels.data[i] = (r > threshold) ? 255 : 0;
+        pixels.data[i + 1] = (g > threshold) ? 255 : 0;
+        pixels.data[i + 2] = (b > threshold) ? 255 : 0;
     }
 
     return pixels;
 };
 
+// applies saturation filter
+// pixels is an ImageData object; level is amount of saturation (1 is unchanged)
 Project.saturation = function (pixels, level) {
     level = (typeof level === 'number') ? level : 2;
     let RW = 0.3086,
@@ -128,7 +138,8 @@ Project.saturation = function (pixels, level) {
     return pixels;
 };
 
-// size is length of side of square kernel
+// performs simple lowpass filter
+// pixels is an ImageData object; size is length of side of square kernel
 Project.lowpass = function (pixels, size) {
     size = size || 5;
     let kernel = [],

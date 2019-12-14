@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="vendor/normalize.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=DM+Sans&display=swap">
     <link rel="stylesheet" href="styles.css">
     <title>EE 440 Final Project</title>
 </head>
@@ -11,20 +13,30 @@
     <p>
         Upload an image from your desktop and select a filter from the select:
     </p>
-    <input type="file" id="file-input" />
-    <label for="filter-changer">Select a filter to apply</label>
-    <select id="filter-changer">
-        <option value="none">None</option>
-        <option value="threshold">Thresholding</option>
-        <option value="saturation">Saturation</option>
-        <option value="lowpass">Lowpass</option>
-        <!-- <option value="sharpen">sharpen</option> -->
-    </select>
-    <input type="range" id="slider" min="0" max="255">
+    <div>
+        <button><label for="file-input">Load File</label></button>
+        <input type="file" id="file-input" />
+        <!-- or
+        <select id="sample-image">
+            <option value="none">Select example</option>
+            <option value="waterfront">Waterfront</option>
+            <option value="circuitBoard">Circuit Board</option> -->
+        </select>
+    </div>
+    <div>
+        <label for="filter-changer">Apply filter</label>
+        <select id="filter-changer">
+            <option value="none">None</option>
+            <option value="threshold">RGB Threshold</option>
+            <option value="saturation">Saturation</option>
+            <option value="lowpass">Lowpass</option>
+        </select>
+        <input type="range" id="slider" min="0" max="255">
+    </div>
     <br>
     
     <img id="original-image" />
-    <canvas id="filtered-image" />
+    <canvas id="filtered-image"></canvas>
 
     <script src="lena.js"></script>
     <script src="init.js"></script>
