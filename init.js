@@ -1,3 +1,13 @@
+/**
+ * Borrowed from lena.js
+ * https://github.com/davidsonfellipe/lena-js/
+ * Made by Davidson Fellipe
+ * Under MIT License
+ * 
+ * Modified by Brian Liu 2019
+ * Under MIT License
+ */
+
 // all project-related image manipulation and display functions
 let Project = {};
 
